@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<title>UMF Pyament Demo - Sign Tools Page</title>
+<link href="assets/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+	<b>please input plain string to plains box, like:</b>
+	<div>
+	{"payer":{"payment_method":"WECHAT_SCAN","bank_code":"CCB","payer_info":{"bank_card":{"number":"rKSXMVa4uxg9Pa6CfiCNnxVQlppvowwivI5In7WQbB2x8hhejFnDfd2dVRirqX8hAhFRq837p4RJNudMmB6hgltXLkEH4eaB4WqgkAPmeUD1tVw7aA7PMEoMReTvrT94b4x8/ASzF70MIFamRP1dJ5j7rUECs3jn3b3UO0teFaw=","citizen_id_number":"LK24Cvbp6UhvcKpPXbKzROGB5RCxnqIQgjtQ+QksEI0bYCEyjLx69Kf+ZmOQG/NEUe53cuyVP9fYAtVCfdg7IlRjuOYAjlL5TrqTNorLeNUvI5YoR/iL8sVieOKIJ9iz1W0Qorj/txPMGJT/bMgZLP46o8IvN1qHFqEJFcHH6rw=","citizen_id_type":"IDENTITY_CARD","payer_name":"mpMQEV+pdrmS5BBIdPiiu8F57Nr59Y3FdJ6vqYw24yZlqA2Bo0ci9asxCYkOB9C+V/qOwWWqDSUk4wqUiT6TUowhdyZzviDCgnEtMyoYZxp6OLksUlhYCrivjM7vefADRjno5nFOsGJ8rZaFwMi7oGkRn9INrHi3zsKyE5p7wm0=","valid_date":"rattViaXjXMp1XeazZG0JyHPsTE0DGi/nNq3OAFVqfklxu6RVRn+IYThobP6vrdfyme5HB0Db63wqSHNCfUrMJ4sV+l7vQUusaUxhUM/vcSzyihteL+uGrpMSFRTHuazAnGYufRsm50JORxyxBZqP7Oq4QgI6fcsmVpbe7rWw+w=","cvv2":"MJnZOxi3Nvssk9y1xghfY/PR7xEXW0VPJxLaDwWZwFs9/gOwPBIeHX+GM4b4OEis3Y3me+bFrJY4RB9N/vP08/YpvhcZxKXe+6G/dACl854TIuqewhsrPRnjREJrKvaBb08x0YCUrg9e0fVwkOwYNA2Uv6HnhEY4tJgB3fTBee8=","phone":"15012345678","external_customer_id":""},"payer_agreement":{"usr_pay_agreement_id":"","usr_busi_agreement_id":""}},"interface_type":"SERVER_TO_WEB","business_type":"B2C"},"order":{"mer_reference_id":"z7fm9mlr3le","mer_date":"20170818","amount":{"total":"0.03","currency":"CNY"},"order_summary":"test for scan bankcard","expire_time":"360","sub_orders":[{"mer_sub_reference_id":"hn3cutaqe","trans_code":"01121990","sub_trans_type":"1","amount":{"total":"0.02","currency":"CNY"},"is_customs":"TRUE","items":[{"mer_item_id":"071815243911","type":"FOOD","name":"Beef","quantity":"2","description":"beef","amount":{"total":"0.01","currency":"CNY"}},{"mer_item_id":"071815243912","type":"ELECTRONIC","name":"Mac Book Pro","quantity":"3","description":"Apple Mac Book","amount":{"total":"0.01","currency":"CNY"}}]},{"mer_sub_reference_id":"tate9gq08","trans_code":"03223010","sub_trans_type":"3","amount":{"total":"0.01","currency":"CNY"}}]},"ret_url":"https://dev.restdemo.umftech.com/restdemo/demo/notifyResultRest","notify_url":"https://dev.restdemo.umftech.com/restdemo/demo/notifyResultRest","risk_info":{"trans_type":"02","goods_type":"1","real_name":"0","business_type":"Y"}}
+	</div>
+	<form action="" id="sumbit_data" enctype='application/json'>
+		plains:
+		<br>
+		<textarea id="plainString" class="form-control" rows="5" cols="80"></textarea>
+		<br> sign:
+		<br>
+		<textarea id="signString" class="form-control" rows="5" cols="80"></textarea>
+		<button type="button" class="btn btn-success" id="btn1">Click me to sign!</button>
+	</form>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script>
+	$(document).ready(function() {
+
+		$("#btn1").click(function() {
+			var pageData = new Object();
+			pageData = $("#plainString").val();
+			pageData= encodeURIComponent(pageData);
+			$.ajax("/restdemo/tools/sign", {
+				method : "POST",
+				contentType : "application/json; charset=utf-8",
+				data : JSON.stringify(pageData),
+				dataType : "text",
+				headers : {},
+				success:function(data){
+					$("#signString").text(data);
+				},
+				error:function(err){
+					$("#signString").text(err.responseText);
+				}
+			});
+		});
+
+	});
+		
+	</script>
+
+</body>
+</html>

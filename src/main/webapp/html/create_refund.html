@@ -1,0 +1,170 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Create a refund</title>
+    <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <style>
+        #main {
+            margin-top: 200px;
+        }
+        .modal {
+		    display:    none;
+		    position:   fixed;
+		    z-index:    1000;
+		    top:        0;
+		    left:       0;
+		    height:     100%;
+		    width:      100%;
+		    background: rgba( 255, 255, 255, .8 ) 
+		                url('http://i.stack.imgur.com/FhHRx.gif') 
+		                50% 50% 
+		                no-repeat;
+		}
+		
+		/* When the body has the loading class, we turn
+		   the scrollbar off with overflow:hidden */
+		body.loading {
+		    overflow: hidden;   
+		}
+		
+		/* Anytime the body has the loading class, our
+		   modal element will be visible */
+		body.loading .modal {
+		    display: block;
+		}
+    </style>
+    <script>
+        $(document).ready(function() {
+        	$("#alerts").hide();
+        	$("#check").click(function(){
+            	$("#alerts").slideUp();
+            	$("body").addClass("loading");
+            	$("#checkResule").empty();
+        		
+        		// parameters for create a payment
+				var pageData =  new Object();
+
+				var amount1 = new Object();
+				amount1.total = "0.01";
+				amount1.currency = "CNY";
+
+				var sub_order1 = new Object();
+				sub_order1.amount = amount1;
+				sub_order1.mer_sub_reference_id = "ujwp38kfe";
+				sub_order1.trans_code = "03223010";
+
+
+				var refund_info = new Object();
+				refund_info.mer_reference_id = getRandomNum(16);
+				var date = new Date();
+				refund_info.mer_date = date.yyyymmdd();
+				var amount = new Object();
+				amount.total = "0.01";
+				amount.currency = "CNY";
+				refund_info.amount = amount;
+				refund_info.refund_summary="test";
+				var sub_orders = new Array();
+				sub_orders[0] = sub_order1;
+				refund_info.sub_orders = sub_orders;
+				//order.user_ip = "10.1.1.1";
+				
+				var pageData = new Object();	
+				//pageData.id = Math.random().toString(36).substr(2);
+				pageData.refund_info = refund_info;
+				pageData.notify_url = "https://dev.restdemo.umftech.com/restdemo/demo/notifyResultRest";
+				pageData.parent_payment=$("#payment_id").val();
+				
+	            $.ajax("/restdemo/payments/createRefund", {
+	                method: "POST",
+	                contentType: "application/json",
+	                data: JSON.stringify(pageData),
+	                dataType: "json",
+	                headers: {},
+	                success: function(data, statusCode) {
+	                    if (data.meta.ret_code == "0000") {
+							$("#result").html(data.meta.state);
+	                        
+	                    } else {
+	                        //$("#result").html(data.meta.ret_msg);
+	   						alertMessage(data.meta.ret_msg);
+	                    }
+	                },
+	                error: function(err) {
+	                    console.log(err);
+	                },
+                    complete: function(){
+                    	$("body").removeClass("loading");
+                    }
+	
+	            });
+            });
+            //Show alert
+            function alertMessage(message) {
+
+                $("#msg").text(message);
+                var timeOut;
+                $("#alerts").slideDown();
+                //Is autoclosing alert
+                var delay = $(this).attr('data-delay');
+                if(delay != undefined)
+                {
+                    delay = parseInt(delay);
+                    clearTimeout(timeOut);
+                    timeOut = window.setTimeout(function() {
+                            alert.slideUp();
+                        }, delay);
+                }
+            }
+            //Close alert
+            $('.page-alert .close').click(function(e) {
+                e.preventDefault();
+                $(this).closest('.page-alerts').slideUp();
+            });
+            Date.prototype.yyyymmdd = function() {
+          	  var mm = this.getMonth() + 1; // getMonth() is zero-based
+          	  var dd = this.getDate();
+
+          	  return [this.getFullYear(),
+          	          (mm>9 ? '' : '0') + mm,
+          	          (dd>9 ? '' : '0') + dd
+          	         ].join('');
+          };
+          function getRandomNum(maxlength){
+        		a = Math.random().toString(36);
+        	    b = a.length;
+        	    return (a.length > 20) ? a.substr(4, maxlength) : a.substr(4);
+        	}
+        });
+    </script>
+</head>
+
+<body>
+	<div class="modal"></div>
+    <div class="container">
+   		<div class="page-alerts" id = "alerts">
+			<div class="alert alert-danger page-alert" id="err-alert">
+		        <button type="button" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+		        <p id = "msg"></p>
+		    </div>
+	    </div>
+	    
+        <div class='form-row'>
+             <div class='form-group card required'>
+                 <label class='control-label'>Payment ID</label>
+                 <input autocomplete='off' class='form-control card-number' size='20' type='text' id = "payment_id">
+             </div>
+           </div>
+            <div>
+  				<input type="button" class="btn btn-info"  id = "check" value="Check">
+		    </div>
+		<div class="form-group required" id="checkResule">
+			<p id="result"></p>
+		</div>
+    </div>
+</body>
+
+</html>

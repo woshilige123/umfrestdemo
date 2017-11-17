@@ -1,0 +1,30 @@
+.DS_Store
+# Eclipse
+.classpath
+.project
+.settings/
+todo.txt
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+build/
+
+*.log
+*.bak
+*.uat
+*.production
+
+# vscode
+.vscode/
+
+/target/
